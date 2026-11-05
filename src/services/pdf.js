@@ -1,0 +1,152 @@
+import { state } from '../core/store.js';
+import { bdt, fmtWhen } from '../core/format.js';
+
+/*
+ * PDF export. jsPDF and autoTable are loaded on demand, so the ~350 KB they weigh
+ * never touches the first load. Only the first PDF download pays for them.
+ */
+const BLUE = [26, 72, 200];
+const RED = [217, 26, 43];
+const INK = [12, 26, 61];
+const MUTED = [102, 115, 154];
+const LINE = [227, 233, 245];
+const TINT = [241, 246, 255];
+
+/* The built-in PDF fonts cover Latin-1 only. */
+const safe = (v) => String(v ?? '').replace(/[^\x20-\x7E -ÿ]/g, '?');
+
+async function loadLibs() {
+  const [jspdf, table] = await Promise.all([import('jspdf'), import('jspdf-autotable')]);
+  return { jsPDF: jspdf.jsPDF || jspdf.default, autoTable: table.autoTable || table.default };
+}
+
+function buildDoc({ jsPDF, autoTable }, batch) {
+  const user = state.user;
+  const doc = new jsPDF({ unit: 'pt', format: 'a4' });
+  const W = doc.internal.pageSize.getWidth();
+  const H = doc.internal.pageSize.getHeight();
+  const L = 44;
+  const R = W - 44;
+
+  doc.setTextColor(...INK);
+  doc.setFont('helvetica', 'bold');
+  doc.setFontSize(15);
+  doc.text('MediFast', L, 52);
+  doc.setTextColor(...BLUE);
+  doc.text('Supplier', L + doc.getTextWidth('MediFast '), 52);
+
+  doc.setFont('helvetica', 'normal');
+  doc.setFontSize(8.5);
+  doc.setTextColor(...MUTED);
+  doc.text('QUOTATION SUBMISSION', R, 46, { align: 'right' });
+  doc.setFont('helvetica', 'bold');
+  doc.setFontSize(18);
+  doc.setTextColor(...INK);
+  doc.text(batch.id, R, 66, { align: 'right' });
+
+  doc.setDrawColor(...RED);
+  doc.setLineWidth(1.6);
+  doc.line(L, 82, L + 46, 82);
+  doc.setDrawColor(...LINE);
+  doc.setLineWidth(0.8);
+  doc.line(L + 46, 82, R, 82);
+
+  /* who and what */
+  doc.setFont('helvetica', 'normal');
+  doc.setFontSize(8);
+  doc.setTextColor(...MUTED);
+  doc.text('SUBMITTED BY', L, 104);
+  doc.text('SUMMARY', R - 190, 104);
+
+  doc.setFont('helvetica', 'bold');
+  doc.setFontSize(10.5);
+  doc.setTextColor(...INK);
+  doc.text(safe(user.biz), L, 120);
+  doc.setFont('helvetica', 'normal');
+  doc.setFontSize(9.5);
+  const address = doc.splitTextToSize(safe(user.addr), 250);
+  doc.text([safe(user.name), ...address, safe(user.phone)], L, 134);
+
+  const summary = [
+    ['Date', fmtWhen(batch.at)],
+    ['Quotations', String(batch.items.length)],
+    ['Total boxes', String(batch.qty)],
+    ['Total amount', bdt(batch.total)],
+  ];
+  summary.forEach(([label, value], i) => {
+    const y = 120 + i * 15;
+    doc.setFont('helvetica', 'normal');
+    doc.setTextColor(...MUTED);
+    doc.text(safe(label), R - 190, y);
+    doc.setTextColor(...INK);
+    if (i === 3) doc.setFont('helvetica', 'bold');
+    doc.text(safe(value), R, y, { align: 'right' });
+  });
+
+  autoTable(doc, {
+    startY: 200,
+    margin: { left: L, right: 44, bottom: 56 },
+    head: [['#', 'Medicine', 'Company', 'Request', 'Qty (Box)', 'Price / Box', 'Total']],
+    body: batch.items.map((item, i) => [
+      String(i + 1),
+      safe(item.name) + (item.generic && item.generic !== 'N/A' ? '\n' + safe(item.generic) : ''),
+      safe(item.co),
+      '#' + item.req,
+      String(item.qty),
+      bdt(item.price),
+      bdt(item.total),
+    ]),
+    foot: [['', '', '', '', '', 'Total', bdt(batch.total)]],
+    theme: 'plain',
+    showFoot: 'lastPage',
+    styles: { font: 'helvetica', fontSize: 9, cellPadding: { top: 7, bottom: 7, left: 6, right: 6 }, textColor: INK, lineColor: LINE, lineWidth: { bottom: 0.6 } },
+    headStyles: { fillColor: BLUE, textColor: [255, 255, 255], fontStyle: 'bold', fontSize: 8, lineWidth: 0 },
+    footStyles: { fontStyle: 'bold', fontSize: 10, fillColor: TINT, textColor: BLUE, lineWidth: 0 },
+    columnStyles: { 0: { cellWidth: 24 }, 3: { cellWidth: 50 }, 4: { halign: 'right', cellWidth: 50 }, 5: { halign: 'right', cellWidth: 74 }, 6: { halign: 'right', cellWidth: 80 } },
+    didParseCell: (d) => {
+      if (d.section === 'head' && d.column.index >= 4) d.cell.styles.halign = 'right';
+      if (d.section === 'foot' && d.column.index >= 5) d.cell.styles.halign = 'right';
+    },
+  });
+
+  const pages = doc.internal.getNumberOfPages();
+  for (let i = 1; i <= pages; i++) {
+    doc.setPage(i);
+    doc.setDrawColor(...LINE);
+    doc.setLineWidth(0.6);
+    doc.line(L, H - 44, R, H - 44);
+    doc.setFont('helvetica', 'normal');
+    doc.setFontSize(8);
+    doc.setTextColor(...MUTED);
+    doc.text('Generated from the MediFast Supplier demo. Sample data only.', L, H - 30);
+    doc.text(`Page ${i} of ${pages}`, R, H - 30, { align: 'right' });
+  }
+  return doc;
+}
+
+/** Build and save the PDF. Throws if the libraries cannot load. */
+export async function downloadSubmission(batch) {
+  const libs = await loadLibs();
+  const doc = buildDoc(libs, batch);
+  const filename = `MediFast-${batch.id}.pdf`;
+
+  /* Inside a hosted page the browser blocks scripted downloads, so the viewer's own
+     save prompt is used when it is offered. Everywhere else the plain save works. */
+  let saver = null;
+  try {
+    saver = window.claude && window.claude.use ? await window.claude.use('downloads') : null;
+  } catch (e) {
+    saver = null;
+  }
+  if (!saver) {
+    doc.save(filename);
+    return 'saved';
+  }
+  try {
+    await saver.save({ filename, data: doc.output('blob') });
+    return 'saved';
+  } catch (e) {
+    if (e && e.code === 'declined') return 'declined';
+    throw e;
+  }
+}

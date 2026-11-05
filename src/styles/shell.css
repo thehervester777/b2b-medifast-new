@@ -1,0 +1,418 @@
+/* ---------- app frame ---------- */
+.shell-root {
+  min-height: 100dvh;
+}
+
+.topbar {
+  position: fixed;
+  inset: 0 0 auto 0;
+  z-index: 50;
+  height: calc(var(--topbar-h) + var(--safe-t));
+  padding: var(--safe-t) var(--gutter) 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  background: #fff;
+  box-shadow: 0 1px 0 transparent;
+  transition: box-shadow 0.3s, background 0.3s;
+}
+.topbar.is-scrolled {
+  box-shadow: 0 1px 0 var(--line), 0 10px 22px -18px rgba(13, 30, 80, 0.45);
+}
+.tb-left {
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.tb-brand {
+  display: inline-flex;
+  min-width: 0;
+  text-decoration: none;
+}
+.tb-right {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.tb-btn {
+  position: relative;
+  width: 44px;
+  height: 44px;
+  flex: none;
+  display: grid;
+  place-items: center;
+  border: 0;
+  border-radius: 14px;
+  background: var(--blue-50);
+  color: var(--blue-700);
+  cursor: pointer;
+  transition: background 0.2s, transform 0.2s var(--ease);
+}
+.tb-btn:active {
+  transform: scale(0.92);
+}
+.tb-btn .ic {
+  width: 22px;
+  height: 22px;
+}
+.badge {
+  position: absolute;
+  top: -4px;
+  right: -4px;
+  min-width: 20px;
+  height: 20px;
+  padding: 0 5px;
+  display: grid;
+  place-items: center;
+  border-radius: 10px;
+  background: var(--red-600);
+  color: #fff;
+  font-size: 11px;
+  font-weight: 800;
+  box-shadow: 0 0 0 2px #fff;
+}
+.dot {
+  position: absolute;
+  top: 9px;
+  right: 10px;
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: var(--red-600);
+  box-shadow: 0 0 0 2px var(--blue-50);
+}
+/* scroll progress: a hairline under the bar, driven by ScrollTrigger */
+.tb-progress {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: -1px;
+  height: 2px;
+  background: linear-gradient(90deg, var(--blue-600), var(--blue-400) 60%, var(--red-500));
+  transform: scaleX(0);
+  transform-origin: left center;
+  pointer-events: none;
+}
+
+.page {
+  max-width: 1120px;
+  margin: 0 auto;
+  padding: calc(var(--topbar-h) + var(--safe-t) + 14px) var(--gutter) calc(var(--safe-b) + 108px);
+  outline: 0;
+}
+
+/* ---------- top navigation (wide screens) ---------- */
+.tb-nav {
+  display: none;
+}
+
+/* very narrow phones: a smaller wordmark, so the menu, name and two buttons all fit */
+@media (max-width: 359px) {
+  .tb-brand .logo-text {
+    font-size: 15px;
+  }
+}
+
+/* ---------- side navigation (phones): a drawer that slides in from the left ---------- */
+.sidenav {
+  position: fixed;
+  inset: 0 auto 0 0;
+  z-index: 60;
+  width: min(300px, 86vw);
+  display: flex;
+  flex-direction: column;
+  gap: 22px;
+  padding: calc(var(--safe-t) + 16px) 14px calc(var(--safe-b) + 16px);
+  overflow-y: auto;
+  background: #fff;
+  box-shadow: 24px 0 48px -26px rgba(11, 26, 70, 0.5);
+  transform: translateX(-102%);
+  visibility: hidden;
+  transition: transform 0.4s var(--ease), visibility 0s 0.4s;
+}
+.nav-open .sidenav {
+  transform: none;
+  visibility: visible;
+  transition-delay: 0s;
+}
+.sn-scrim {
+  position: fixed;
+  inset: 0;
+  z-index: 58;
+  background: rgba(11, 26, 70, 0.46);
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.3s, visibility 0s 0.3s;
+}
+.nav-open .sn-scrim {
+  opacity: 1;
+  visibility: visible;
+  transition-delay: 0s;
+}
+.sn-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 0 6px;
+}
+.sn-brand {
+  display: inline-flex;
+  text-decoration: none;
+}
+.sn-nav {
+  position: relative;
+  display: grid;
+  gap: 4px;
+}
+.sn-nav a {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  gap: 13px;
+  height: 50px;
+  padding: 0 14px;
+  border-radius: 14px;
+  color: var(--ink-3);
+  font-size: 15px;
+  font-weight: 700;
+  text-decoration: none;
+  transition: color 0.25s;
+}
+.sn-nav a .ic {
+  width: 22px;
+  height: 22px;
+  flex: none;
+}
+.sn-nav a span {
+  flex: 1;
+}
+.sn-nav a.on {
+  color: var(--blue-700);
+}
+/* the highlight slides between links; its red tick is the one accent in the menu */
+.sn-ink {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  height: 50px;
+  border-radius: 14px;
+  background: var(--blue-50);
+  pointer-events: none;
+}
+.sn-ink::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 14px;
+  bottom: 14px;
+  width: 3px;
+  border-radius: 0 3px 3px 0;
+  background: var(--red-600);
+}
+.cnt {
+  min-width: 22px;
+  padding: 1px 7px;
+  border-radius: 99px;
+  background: var(--blue-100);
+  color: var(--blue-700);
+  font-size: 11.5px;
+  font-weight: 800;
+  text-align: center;
+}
+.sn-user {
+  margin-top: auto;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px;
+  border-radius: 16px;
+  background: var(--bg);
+  color: inherit;
+  text-decoration: none;
+}
+.sn-av {
+  width: 42px;
+  height: 42px;
+  flex: none;
+  display: grid;
+  place-items: center;
+  border-radius: 14px;
+  background: var(--blue-600);
+  color: #fff;
+  font-size: 18px;
+  font-weight: 800;
+}
+.sn-who {
+  min-width: 0;
+  display: grid;
+}
+.sn-who b,
+.sn-who small {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.sn-who b {
+  font-size: 14.5px;
+  font-weight: 800;
+}
+.sn-who small {
+  color: var(--ink-3);
+  font-size: 12.5px;
+}
+
+/* ---------- floating cart pill ---------- */
+.cart-pill {
+  position: fixed;
+  left: 12px;
+  right: 12px;
+  bottom: calc(var(--safe-b) + 14px);
+  z-index: 45;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 9px 12px 9px 9px;
+  border: 0;
+  border-radius: 20px;
+  background: linear-gradient(135deg, var(--blue-700), var(--blue-500));
+  color: #fff;
+  text-align: left;
+  cursor: pointer;
+  box-shadow: 0 14px 26px -12px rgba(26, 72, 200, 0.75);
+}
+.cart-pill:active {
+  transform: scale(0.985);
+}
+.cp-ic {
+  width: 42px;
+  height: 42px;
+  display: grid;
+  place-items: center;
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.16);
+}
+.cp-txt {
+  flex: 1;
+  min-width: 0;
+  display: grid;
+}
+.cp-txt b {
+  font-size: 14.5px;
+}
+.cp-txt small {
+  font-size: 12px;
+  color: var(--blue-100);
+}
+.cp-sum {
+  font-size: 17px;
+  font-weight: 800;
+}
+.cp-go {
+  width: 32px;
+  height: 32px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  background: #fff;
+  color: var(--blue-700);
+}
+
+.to-top {
+  position: fixed;
+  right: 16px;
+  bottom: calc(var(--safe-b) + 88px);
+  z-index: 40;
+  width: 44px;
+  height: 44px;
+  display: grid;
+  place-items: center;
+  border: 0;
+  border-radius: 50%;
+  background: #fff;
+  color: var(--blue-700);
+  box-shadow: 0 8px 20px -8px rgba(13, 30, 80, 0.45), 0 0 0 1px var(--line);
+  cursor: pointer;
+  opacity: 0;
+  transform: translateY(14px) scale(0.9);
+  pointer-events: none;
+  transition: opacity 0.3s, transform 0.4s var(--ease);
+}
+.to-top.on {
+  opacity: 1;
+  transform: none;
+  pointer-events: auto;
+}
+
+/* ---------- wide screens ---------- */
+@media (min-width: 900px) {
+  :root {
+    --topbar-h: 68px;
+  }
+  .sidenav,
+  .sn-scrim,
+  .tb-menu {
+    display: none;
+  }
+  .page {
+    padding-bottom: 120px;
+  }
+  .tb-nav {
+    position: absolute;
+    left: 50%;
+    top: calc(var(--safe-t) + 11px);
+    transform: translateX(-50%);
+    display: flex;
+    gap: 2px;
+    padding: 4px;
+    height: 46px;
+    border-radius: 15px;
+    background: var(--blue-50);
+  }
+  .tb-nav a {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    height: 38px;
+    padding: 0 16px;
+    border-radius: 12px;
+    color: var(--ink-3);
+    font-size: 14px;
+    font-weight: 700;
+    text-decoration: none;
+    transition: color 0.25s;
+  }
+  .tb-nav a:hover {
+    color: var(--ink);
+  }
+  .tb-nav a.on {
+    color: var(--blue-700);
+  }
+  .tb-ink {
+    position: absolute;
+    left: 0;
+    top: 4px;
+    bottom: 4px;
+    width: 0;
+    border-radius: 12px;
+    background: #fff;
+    box-shadow: 0 3px 10px -4px rgba(13, 30, 80, 0.3);
+    pointer-events: none;
+  }
+  .cart-pill {
+    left: auto;
+    right: 28px;
+    bottom: 28px;
+    width: 360px;
+  }
+  .to-top {
+    right: 28px;
+    bottom: 104px;
+  }
+}
