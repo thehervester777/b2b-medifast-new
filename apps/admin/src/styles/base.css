@@ -1,0 +1,184 @@
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
+  scrollbar-gutter: stable;
+  background: var(--bg);
+}
+html.is-locked {
+  overflow: hidden;
+}
+
+body {
+  margin: 0;
+  min-height: 100dvh;
+  background: var(--bg);
+  color: var(--ink);
+  font-family: var(--font);
+  font-size: 14.5px;
+  line-height: 1.5;
+  font-variant-numeric: tabular-nums;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+  overflow-x: hidden;
+}
+
+h1,
+h2,
+h3,
+h4,
+p,
+ul,
+ol,
+dl,
+dd,
+figure {
+  margin: 0;
+  padding: 0;
+}
+ul,
+ol {
+  list-style: none;
+}
+h1,
+h2,
+h3,
+h4 {
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  text-wrap: balance;
+}
+b,
+strong {
+  font-weight: 700;
+}
+small {
+  font-size: 12.5px;
+  color: var(--ink-3);
+}
+a {
+  color: inherit;
+  text-decoration: none;
+}
+button,
+input,
+select,
+textarea {
+  font: inherit;
+  color: inherit;
+}
+button {
+  cursor: pointer;
+}
+img,
+svg {
+  display: block;
+  max-width: 100%;
+}
+[hidden] {
+  display: none !important;
+}
+
+:focus-visible {
+  outline: 2px solid var(--blue-500);
+  outline-offset: 2px;
+  border-radius: 6px;
+}
+:focus:not(:focus-visible) {
+  outline: 0;
+}
+.page:focus {
+  outline: 0;
+}
+
+.ic {
+  width: 20px;
+  height: 20px;
+  flex: none;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.8;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.auth-root,
+.shell-root {
+  min-height: 100dvh;
+}
+
+.layer {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  pointer-events: none;
+}
+.layer > * {
+  pointer-events: auto;
+}
+
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--blue-200) transparent;
+}
+
+/* ---------- brand ---------- */
+.logo {
+  display: inline-flex;
+  align-items: center;
+  color: var(--ink);
+  text-decoration: none;
+}
+.logo-text {
+  font-size: 19px;
+  font-weight: 800;
+  letter-spacing: -0.025em;
+  white-space: nowrap;
+}
+.logo-text b {
+  margin-left: 0.28em;
+  font-weight: 600;
+  color: var(--blue-600);
+}
+
+.num {
+  font-variant-numeric: tabular-nums;
+}
+.neg {
+  color: var(--red-600);
+}
+.pos {
+  color: var(--blue-700);
+}
+.late {
+  color: var(--red-600);
+  font-weight: 700;
+}
+.muted {
+  color: var(--ink-3);
+}
+.danger-text {
+  color: var(--red-700);
+}
+.grow {
+  flex: 1;
+}
+.wrap {
+  overflow-wrap: anywhere;
+}
+
+/* Reduced motion: nothing moves. */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}

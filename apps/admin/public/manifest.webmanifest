@@ -1,0 +1,8 @@
+{
+  "name": "MediFast Admin",
+  "short_name": "MediFast Admin",
+  "start_url": ".",
+  "display": "standalone",
+  "background_color": "#f4f7fc",
+  "theme_color": "#0c1a3d"
+}

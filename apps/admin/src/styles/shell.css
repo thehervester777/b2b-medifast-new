@@ -1,0 +1,871 @@
+/* ============================================================================
+   The signed-in frame: navy sidebar, top bar, page area, floating bits.
+   Sidebar is fixed on wide screens and a slide-in drawer below 1024px.
+   ========================================================================== */
+
+.shell-root {
+  min-height: 100vh;
+  min-height: 100dvh;
+}
+
+/* ---------- sidebar ---------- */
+.side {
+  position: fixed;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  z-index: 60;
+  width: min(var(--side-w), 86vw);
+  display: flex;
+  flex-direction: column;
+  padding-bottom: calc(14px + var(--safe-b));
+  background: linear-gradient(180deg, #0d1c48 0%, #0a1639 100%);
+  color: #fff;
+  transform: translateX(-102%);
+  visibility: hidden;
+  transition: transform 0.5s var(--ease), visibility 0s linear 0.5s;
+}
+.nav-open .side {
+  transform: none;
+  visibility: visible;
+  transition-delay: 0s;
+  box-shadow: 24px 0 60px -20px rgba(5, 12, 36, 0.6);
+}
+
+.side-edge {
+  display: none;
+}
+.tb-title .crumb,
+.tb-title .crumb-sep {
+  display: none;
+}
+.logo-short {
+  display: none;
+  color: #fff;
+  font-size: 17px;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+}
+.side .logo-text {
+  max-width: 180px;
+  overflow: hidden;
+  transition: max-width 0.38s var(--ease), opacity 0.25s;
+}
+.nav-tip {
+  position: fixed;
+  z-index: 90;
+  transform: translateY(-50%);
+  padding: 7px 11px;
+  background: var(--navy);
+  border-radius: 8px;
+  box-shadow: 0 10px 24px -10px rgba(8, 16, 42, 0.6), 0 0 0 1px rgba(255, 255, 255, 0.08) inset;
+  color: #fff;
+  font-size: 12.5px;
+  font-weight: 700;
+  white-space: nowrap;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.15s;
+}
+.nav-tip.on {
+  opacity: 1;
+}
+.side-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: calc(20px + var(--safe-t)) 18px 14px 24px;
+}
+.side .logo {
+  color: #fff;
+}
+.side .logo-text b {
+  color: #8fb0ff;
+}
+.side-x {
+  color: rgba(255, 255, 255, 0.8);
+}
+.side-x:hover {
+  background: rgba(255, 255, 255, 0.1);
+  color: #fff;
+}
+
+.side-nav {
+  position: relative;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin: 10px 12px 0;
+  overflow-y: auto;
+}
+.side-nav a {
+  position: relative;
+  z-index: 1;
+  flex: none;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  height: 46px;
+  padding: 0 14px;
+  border-radius: 12px;
+  color: rgba(255, 255, 255, 0.62);
+  font-size: 14.5px;
+  font-weight: 600;
+  transition: color 0.25s, background-color 0.25s;
+}
+.side-nav a.gap {
+  margin-top: 18px;
+}
+.side-nav a:hover {
+  color: #fff;
+  background: rgba(255, 255, 255, 0.05);
+}
+.side-nav a.on {
+  color: #fff;
+  background: transparent;
+}
+.side-nav a:focus-visible {
+  outline-color: #8fb0ff;
+}
+.side-nav .ic {
+  width: 20px;
+  height: 20px;
+}
+
+/* The highlight slides between links (GSAP sets its y and height). */
+.side-ink {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 0;
+  height: 46px;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.1);
+  opacity: 0;
+  pointer-events: none;
+}
+.side-ink::before {
+  content: '';
+  position: absolute;
+  top: 12px;
+  bottom: 12px;
+  left: 0;
+  width: 3px;
+  border-radius: 0 3px 3px 0;
+  background: #6b97fa;
+}
+
+.nb {
+  margin-left: auto;
+  min-width: 22px;
+  height: 20px;
+  padding: 0 7px;
+  display: grid;
+  place-items: center;
+  border-radius: 99px;
+  font-size: 11.5px;
+  font-style: normal;
+  font-weight: 800;
+  line-height: 1;
+}
+.nb-red {
+  background: var(--red-500);
+  color: #fff;
+}
+.nb-soft {
+  background: rgba(255, 255, 255, 0.14);
+  color: #fff;
+}
+
+.side-foot {
+  margin: 12px 12px 0;
+  padding: 14px 4px 0 6px;
+  border-top: 1px solid rgba(255, 255, 255, 0.09);
+}
+.me {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.me-t {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  line-height: 1.3;
+}
+.me-t b {
+  font-size: 13.5px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.me-t small {
+  color: rgba(255, 255, 255, 0.55);
+}
+.side .av {
+  background: rgba(255, 255, 255, 0.14);
+  color: #fff;
+}
+.side-foot .icon-btn {
+  color: rgba(255, 255, 255, 0.7);
+}
+.side-foot .icon-btn:hover {
+  background: rgba(255, 255, 255, 0.1);
+  color: #fff;
+}
+
+.side-scrim {
+  position: fixed;
+  inset: 0;
+  z-index: 55;
+  background: rgba(8, 16, 42, 0.55);
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.35s, visibility 0s linear 0.35s;
+}
+.nav-open .side-scrim {
+  opacity: 1;
+  visibility: visible;
+  transition-delay: 0s;
+}
+
+/* ---------- main column ---------- */
+.main {
+  min-width: 0;
+}
+
+.topbar {
+  position: sticky;
+  top: 0;
+  z-index: 30;
+  height: calc(var(--topbar-h) + var(--safe-t));
+  padding: var(--safe-t) var(--gutter) 0;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: var(--bg);
+  transition: box-shadow 0.3s;
+}
+.topbar.is-scrolled {
+  box-shadow: 0 1px 0 var(--line), 0 10px 26px -20px rgba(11, 24, 64, 0.35);
+}
+
+.topbar .tb-menu,
+.topbar .tb-btn {
+  width: 42px;
+  height: 42px;
+  background: #fff;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+}
+.topbar .tb-menu:hover,
+.topbar .tb-btn:hover {
+  border-color: var(--blue-300);
+}
+.tb-title {
+  flex: 1;
+  min-width: 0;
+  font-size: 16px;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  opacity: 0;
+  transform: translateY(8px);
+  transition: opacity 0.3s, transform 0.4s var(--ease);
+}
+.topbar.title-on .tb-title {
+  opacity: 1;
+  transform: none;
+}
+
+.cmd {
+  flex: 0 1 340px;
+  min-width: 0;
+  height: 42px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 0 10px 0 14px;
+  background: #fff;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  color: var(--ink-3);
+  font-weight: 500;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+.cmd:hover {
+  border-color: var(--blue-300);
+}
+.cmd:focus-visible {
+  outline-offset: 2px;
+}
+.cmd-t {
+  flex: 1;
+  text-align: left;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+kbd {
+  font: 600 11px/1 var(--font);
+  padding: 4px 6px;
+  color: var(--ink-3);
+  background: var(--bg);
+  border: 1px solid var(--line);
+  border-bottom-width: 2px;
+  border-radius: 6px;
+}
+
+.tb-right {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.topbar .tb-btn {
+  position: relative;
+}
+.dot {
+  position: absolute;
+  top: -6px;
+  right: -6px;
+  min-width: 19px;
+  height: 19px;
+  padding: 0 5px;
+  display: grid;
+  place-items: center;
+  border: 2px solid var(--bg);
+  border-radius: 99px;
+  background: var(--red-600);
+  color: #fff;
+  font-size: 10.5px;
+  font-weight: 800;
+  line-height: 1;
+}
+.tb-me {
+  width: 42px;
+  height: 42px;
+  padding: 0;
+  display: grid;
+  place-items: center;
+  background: none;
+  border: 0;
+  border-radius: 50%;
+  transition: box-shadow 0.2s;
+}
+.tb-me:hover {
+  box-shadow: 0 0 0 3px var(--blue-100);
+}
+.tb-me .av {
+  width: 38px;
+  height: 38px;
+}
+
+/* ---------- page area ---------- */
+.page {
+  max-width: 1240px;
+  margin: 0 auto;
+  padding: 4px var(--gutter) calc(96px + var(--safe-b));
+}
+
+.page-head {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 14px 20px;
+  padding: 14px 0 22px;
+}
+.page-head h1 {
+  font-size: clamp(25px, 3.2vw, 32px);
+  line-height: 1.15;
+  letter-spacing: -0.035em;
+}
+.page-head p {
+  margin-top: 6px;
+  color: var(--ink-3);
+}
+.ph-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.to-top {
+  position: fixed;
+  right: 20px;
+  bottom: calc(20px + var(--safe-b));
+  z-index: 35;
+  width: 46px;
+  height: 46px;
+  display: grid;
+  place-items: center;
+  border: 0;
+  border-radius: 50%;
+  background: var(--navy);
+  color: #fff;
+  box-shadow: 0 14px 30px -10px rgba(11, 24, 64, 0.55);
+  opacity: 0;
+  transform: translateY(14px) scale(0.9);
+  pointer-events: none;
+  transition: opacity 0.3s, transform 0.4s var(--ease);
+}
+.to-top.on {
+  opacity: 1;
+  transform: none;
+  pointer-events: auto;
+}
+.to-top:hover {
+  background: var(--blue-700);
+}
+
+/* ---------- toasts ---------- */
+/* Bottom-left of the page: clear of drawers and their footer buttons on the right,
+   and of the back-to-top button. On phones they drop to the top, clear of bottom sheets. */
+.toasts {
+  position: fixed;
+  left: 20px;
+  bottom: calc(20px + var(--safe-b));
+  z-index: 200;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 10px;
+  pointer-events: none;
+}
+body:has(.bulk:not([hidden])) .toasts {
+  bottom: calc(96px + var(--safe-b));
+}
+.toast {
+  position: relative;
+  min-width: 270px;
+  max-width: min(440px, calc(100vw - 32px));
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 12px 15px 14px;
+  overflow: hidden;
+  background: var(--navy);
+  border-radius: 14px;
+  box-shadow: 0 20px 44px -16px rgba(8, 16, 42, 0.6), 0 0 0 1px rgba(255, 255, 255, 0.06) inset;
+  color: #fff;
+  pointer-events: auto;
+}
+.toast-ic {
+  width: 26px;
+  height: 26px;
+  flex: none;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  background: var(--blue-500);
+}
+.toast-ic .ic {
+  width: 15px;
+  height: 15px;
+  stroke-width: 2.4;
+}
+.toast-err .toast-ic {
+  background: var(--red-600);
+}
+.toast-msg {
+  flex: 1;
+  min-width: 0;
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 1.35;
+}
+.toast-act {
+  height: 32px;
+  flex: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 0 12px;
+  background: rgba(255, 255, 255, 0.14);
+  border: 0;
+  border-radius: 9px;
+  color: #fff;
+  font-size: 13px;
+  font-weight: 700;
+  transition: background-color 0.2s;
+}
+.toast-act:hover {
+  background: rgba(255, 255, 255, 0.26);
+}
+.toast-act .ic {
+  width: 15px;
+  height: 15px;
+}
+.toast-bar {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 3px;
+  background: var(--blue-400);
+  transform-origin: left center;
+}
+.toast-err .toast-bar {
+  background: var(--red-500);
+}
+
+/* ============================ wide screens ============================ */
+/* The app fills the screen: a full-height sidebar that collapses to an icon rail, and a page area with no
+   fixed width. The width lives in --side-w, so the page, the bulk bar and the toasts all follow it. */
+@media (min-width: 1024px) {
+  html[data-side='collapsed'] {
+    --side-w: 76px;
+  }
+  .side {
+    width: var(--side-w);
+    transform: none;
+    visibility: visible;
+    transition: width 0.38s var(--ease);
+  }
+  .side-scrim,
+  .side .side-x {
+    display: none;
+  }
+  .main {
+    margin-left: var(--side-w);
+    transition: margin-left 0.38s var(--ease);
+  }
+  .toasts {
+    left: calc(var(--side-w) + 20px);
+    transition: left 0.38s var(--ease);
+  }
+
+  /* the handle on the sidebar's edge */
+  .side-edge {
+    position: absolute;
+    top: 76px;
+    right: -13px;
+    z-index: 3;
+    width: 26px;
+    height: 26px;
+    display: grid;
+    place-items: center;
+    padding: 0;
+    background: #fff;
+    border: 1px solid var(--line);
+    border-radius: 50%;
+    color: var(--ink-2);
+    box-shadow: 0 6px 14px -6px rgba(11, 24, 64, 0.45);
+    transition: background-color 0.2s, color 0.2s, border-color 0.2s, transform 0.2s var(--ease);
+  }
+  .side-edge:hover {
+    background: var(--blue-600);
+    border-color: var(--blue-600);
+    color: #fff;
+    transform: scale(1.1);
+  }
+  .side-edge .ic {
+    width: 15px;
+    height: 15px;
+    transition: transform 0.38s var(--ease);
+  }
+  html[data-side='collapsed'] .side-edge .ic {
+    transform: rotate(180deg);
+  }
+
+  /* collapsed: icons only */
+  html[data-side='collapsed'] .side-head {
+    padding-left: 0;
+    padding-right: 0;
+    justify-content: center;
+  }
+  html[data-side='collapsed'] .side .logo-text {
+    display: none;
+  }
+  html[data-side='collapsed'] .side .logo-short {
+    display: inline;
+  }
+  html[data-side='collapsed'] .side-nav {
+    margin-left: 10px;
+    margin-right: 10px;
+  }
+  html[data-side='collapsed'] .side-nav a {
+    gap: 0;
+    padding: 0;
+    justify-content: center;
+  }
+  html[data-side='collapsed'] .side-nav a > span:not(.nb) {
+    max-width: 0;
+    opacity: 0;
+  }
+  html[data-side='collapsed'] .side-nav .nb {
+    position: absolute;
+    top: 3px;
+    right: 5px;
+    min-width: 18px;
+    height: 18px;
+    padding: 0 5px;
+    margin: 0;
+    font-size: 10.5px;
+    box-shadow: 0 0 0 2px #0b1840;
+  }
+  html[data-side='collapsed'] .nav-label {
+    height: 1px;
+    margin: 14px 12px;
+    padding: 0;
+    background: rgba(255, 255, 255, 0.12);
+    font-size: 0;
+    overflow: hidden;
+  }
+  html[data-side='collapsed'] .side-nav .nav-label:first-of-type {
+    margin-top: 6px;
+  }
+  html[data-side='collapsed'] .side-foot {
+    margin-left: 10px;
+    margin-right: 10px;
+    padding-left: 0;
+    padding-right: 0;
+  }
+  html[data-side='collapsed'] .me {
+    flex-direction: column;
+    gap: 8px;
+  }
+  html[data-side='collapsed'] .me-t {
+    display: none;
+  }
+
+  /* the app uses the whole screen */
+  .page {
+    max-width: none;
+  }
+
+  /* breadcrumb in the top bar, always on */
+  .topbar .tb-title {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    opacity: 1;
+    transform: none;
+    font-size: 15px;
+  }
+  .tb-title .crumb,
+  .tb-title .crumb-sep {
+    display: inline;
+  }
+  .tb-title .crumb {
+    color: var(--ink-3);
+    font-weight: 600;
+  }
+  .tb-title .crumb-sep {
+    color: var(--ink-4);
+    font-style: normal;
+    font-weight: 500;
+  }
+  .tb-title b {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    font-weight: 800;
+  }
+}
+@media (min-width: 1600px) {
+  :root {
+    --gutter: 40px;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .side,
+  .main,
+  .toasts,
+  .side-edge .ic,
+  .logo-text,
+  .side-nav a > span {
+    transition: none !important;
+  }
+}
+
+/* ============================ tablets / phones ============================ */
+@media (max-width: 1023px) {
+  .side .side-x {
+    display: inline-grid;
+  }
+  .cmd {
+    flex-basis: 260px;
+  }
+}
+
+@media (max-width: 719px) {
+  .cmd {
+    flex: none;
+    width: 42px;
+    padding: 0;
+    justify-content: center;
+  }
+  .cmd-t,
+  .cmd-k {
+    display: none;
+  }
+  .tb-right {
+    gap: 8px;
+  }
+  .toasts {
+    top: calc(10px + var(--safe-t));
+    right: 12px;
+    bottom: auto;
+    left: 12px;
+    flex-direction: column-reverse;
+    align-items: stretch;
+  }
+  body:has(.bulk:not([hidden])) .toasts {
+    bottom: auto;
+  }
+  .toast {
+    min-width: 0;
+    max-width: none;
+  }
+  .to-top {
+    right: 14px;
+    bottom: calc(14px + var(--safe-b));
+    width: 42px;
+    height: 42px;
+  }
+}
+
+@media (hover: none) {
+  .cmd-k {
+    display: none;
+  }
+}
+
+/* ---------- grouped menu, site bars, maintenance flag ---------- */
+.nav-label {
+  flex: none;
+  margin: 16px 14px 4px;
+  color: rgba(255, 255, 255, 0.38);
+  font-size: 11.5px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+.side-nav .nav-label:first-of-type {
+  margin-top: 4px;
+}
+.side-nav a {
+  height: 42px;
+}
+.side-ink {
+  height: 42px;
+}
+.side-nav a span {
+  min-width: 0;
+  max-width: 200px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  transition: max-width 0.38s var(--ease), opacity 0.2s;
+}
+
+.sys:empty {
+  display: none;
+}
+.sysbar {
+  padding: 10px var(--gutter);
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 13.5px;
+  line-height: 1.45;
+}
+.sysbar > .ic {
+  flex: none;
+  width: 18px;
+  height: 18px;
+}
+.sysbar > span {
+  flex: 1;
+  min-width: 0;
+}
+.sysbar b {
+  font-weight: 700;
+}
+.sysbar.is-maint {
+  background: var(--navy);
+  color: #fff;
+}
+.sysbar.is-notice.tone-info {
+  background: var(--blue-50);
+  color: var(--blue-800);
+  box-shadow: inset 0 -1px 0 var(--blue-100);
+}
+.sysbar.is-notice.tone-warning {
+  background: #fff6e0;
+  color: #7a4b00;
+  box-shadow: inset 0 -1px 0 #f6e2b0;
+}
+.sysbar.is-notice.tone-urgent {
+  background: var(--red-50);
+  color: var(--red-700);
+  box-shadow: inset 0 -1px 0 var(--red-100);
+}
+.sys-btn {
+  flex: none;
+  height: 30px;
+  padding: 0 12px;
+  background: rgba(255, 255, 255, 0.14);
+  border: 0;
+  border-radius: 8px;
+  color: inherit;
+  font-weight: 700;
+}
+.sys-btn:hover {
+  background: rgba(255, 255, 255, 0.26);
+}
+.sys-x {
+  flex: none;
+  width: 28px;
+  height: 28px;
+  display: grid;
+  place-items: center;
+  background: none;
+  border: 0;
+  border-radius: 8px;
+  color: inherit;
+  opacity: 0.7;
+}
+.sys-x:hover {
+  background: rgba(0, 0, 0, 0.07);
+  opacity: 1;
+}
+.sys-x .ic {
+  width: 16px;
+  height: 16px;
+}
+.tb-maint {
+  height: 30px;
+  padding: 0 10px;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: var(--navy);
+  border-radius: 99px;
+  color: #fff;
+  font-size: 12px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+.tb-maint[hidden] {
+  display: none;
+}
+.tb-maint .ic {
+  width: 14px;
+  height: 14px;
+}
+@media (max-width: 599px) {
+  .tb-maint span {
+    display: none;
+  }
+  .tb-maint {
+    width: 30px;
+    padding: 0;
+    justify-content: center;
+  }
+}

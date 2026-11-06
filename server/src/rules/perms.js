@@ -1,0 +1,46 @@
+'use strict';
+/* Permission keys. The admin panel has the same list in apps/admin/src/data/constants.js (a test keeps them equal). */
+const ALL_PERMS = [
+  'dashboard.view',
+  'requests.view',
+  'requests.manage',
+  'quotes.view',
+  'quotes.decide',
+  'orders.view',
+  'orders.manage',
+  'orders.documents',
+  'products.view',
+  'products.manage',
+  'products.send',
+  'suppliers.view',
+  'suppliers.manage',
+  'reports.view',
+  'reports.export',
+  'audit.view',
+  'site.manage',
+  'settings.manage',
+  'access.manage',
+];
+const ROLE_NAMES = ['Owner', 'Manager', 'Reviewer', 'Warehouse', 'Finance'];
+const PERM_LABEL = {
+  'dashboard.view': 'See the dashboard',
+  'requests.view': 'See requests',
+  'requests.manage': 'Post, edit and close requests',
+  'quotes.view': 'See quotes',
+  'quotes.decide': 'Approve, reject and award quotes',
+  'orders.view': 'See orders',
+  'orders.manage': 'Update order status',
+  'orders.documents': 'Print invoices and warehouse papers',
+  'products.view': 'See products',
+  'products.manage': 'Add and edit products',
+  'products.send': 'Send products to the supplier app',
+  'suppliers.view': 'See suppliers',
+  'suppliers.manage': 'Verify and suspend suppliers',
+  'reports.view': 'See reports',
+  'reports.export': 'Export reports',
+  'audit.view': 'See audit logs',
+  'site.manage': 'Change the site notice and maintenance mode',
+  'settings.manage': 'Change settings',
+  'access.manage': 'Manage admins and roles',
+};
+module.exports = { ALL_PERMS, ROLE_NAMES, PERM_LABEL };
